@@ -1,0 +1,28 @@
+{
+  "name": "libreria-mpc-v2",
+  "version": "1.0.0",
+  "description": "this library permit to solve some specific mpc problems, using various aproches. Problems in version 1 are: equality and comparison of simple items, set intersection ",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "alert('no tests created yet')"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/StefanoF96/Tesi-mpc-lib-v2.git"
+  },
+  "keywords": [
+    "mpc",
+    "practical",
+    "set-intersection"
+  ],
+  "author": "Stefano Fasani",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/StefanoF96/Tesi-mpc-lib-v2/issues"
+  },
+  "homepage": "https://github.com/StefanoF96/Tesi-mpc-lib-v2#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "jiff-mpc": "0.0.1"
+  }
+}
