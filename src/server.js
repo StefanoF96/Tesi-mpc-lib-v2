@@ -1,20 +1,41 @@
-var express = require('express');
-var app = express();
-var server = require('http').Server(app);
-var jiff = require('jiff-mpc');
 
-app.use('/app', express.static('./static/', {
-    extensions: ['html', 'htm']
-		}));
-app.use('/lib', express.static('./lib'));
-app.use('/dist', express.static('./dist'));
-//app.use('/app', express.static('./static/'));
+module.exports = function () {
+	
+  this.mpcCreate = (implementation_id, debug=true, port=9000) => {
+		
+		switch(implementation_id){
+		
+		case "jiff":
+			var server = require('http').Server();
+			
+			server.listen(port, function() {
+				if (debug)
+					console.log('listening on *:'+port);
+			});
 
-server.listen(9000, function() {
-  console.log('listening on http://localhost:9000/app/client');
-});
+			var JIFFServer = require('../lib/jiff');
+			var jiffServer = new JIFFServer(server, { logs:debug });
+			
+			break;
 
-var jiffServer = jiff.make_jiff(server, { logs:true });
+		default:
+			return false;
+		}
+	}
+	
+
+}
 
 
+/*
 
+module.exports = function () {
+	this.name = 'GeeksforGeeks';
+	this.website = 'https://geeksforgeeks.org';
+	this.info = () => {
+		console.log(`Company name - ${this.name}`);
+		console.log(`Website - ${this.website}`);
+	}
+}
+
+*/

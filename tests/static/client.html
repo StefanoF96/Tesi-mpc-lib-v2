@@ -1,0 +1,42 @@
+<html>
+  <head>
+    <title>MPC test</title>
+    <style>
+		.
+		.
+		.
+    </style>
+		<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+		<script type="text/javascript" src="/lib/jiff//dist/jiff-client.js"></script> <!-- exposes global object 'JIFFClient' -->
+		<script type="text/javascript" src="/src/client.js"></script> <!-- exposes the client lib code -->
+		<!--script src="/lib/jiff/cryptico.min.js"></script-->
+		<!--script src="/lib/jiff/socket.io.js"></script-->
+		<script type="text/javascript" src="/app/client.js"></script> <!-- custom client code -->
+  </head>
+  <body>
+		<h1>init MPC</h1>
+    <label>implementation<label> <select name = "implementation" id="implems"></select>
+		
+		<input id="comp_id", placeholder="computation_id"> &nbsp; <button id="connectButton" onclick="connect_and_notify();">Connect</button>
+    </br></br></br></br></br>
+		<label for="number1">Number to compare<label> <input id="number1" onkeyup="EnableDisable(this,'button1')"> &nbsp; 
+		<button onclick="computeEquality();" disabled="disabled" id="button1">Submit</button><br/>
+		</br>
+		<div style="background-color: black; color:#73f273; padding-top: 3px; width:50%; max-height:500px; overflow:auto" id="output"></div>
+		
+   
+	 
+	 <script>
+		for(element in simple_mpc.implementations_list)
+		{
+			 var opt = document.createElement("option");
+			 opt.value = simple_mpc.implementations_list[element];
+			 opt.text = simple_mpc.implementations_list[element];
+
+			 // then append it to the select element
+			 $('#implems').append(opt);
+		}
+		
+	 </script>
+  </body>
+</html>
