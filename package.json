@@ -1,10 +1,10 @@
 {
   "name": "libreria-mpc-v2",
   "version": "1.0.0",
-  "description": "this library permit to solve some specific mpc tasks, using various approches. Solved tasks in version 1 are: equality and comparison of simple items, set intersection ",
+  "description": "this library permit to solve some specific mpc problems, using various aproches. Problems in version 1 are: equality and comparison of simple items, set intersection ",
   "main": "src/index.js",
   "scripts": {
-    "test": "console.log('no tests created yet')"
+    "test": "alert('no tests created yet')"
   },
   "repository": {
     "type": "git",
@@ -23,7 +23,12 @@
   "homepage": "https://github.com/StefanoF96/Tesi-mpc-lib-v2#readme",
   "dependencies": {
     "express": "^4.17.1",
+<<<<<<< HEAD
     "jigg": "^1.0.1"
   },
   "//": "install manually jiff module from https://github.com/multiparty/jiff/  in ./lib/jiff/"
+=======
+    "jiff-mpc": "0.0.1"
+  }
+>>>>>>> parent of 59ef8ed... reworked jiff implementation, with github module, instad of the npm one
 }

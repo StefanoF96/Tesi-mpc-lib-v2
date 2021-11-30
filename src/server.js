@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 module.exports = function () {
 	
 	const util = require("util");
@@ -59,25 +60,25 @@ module.exports = function () {
 			
 			
 			break;
+=======
+var express = require('express');
+var app = express();
+var server = require('http').Server(app);
+var jiff = require('jiff-mpc');
 
-		default:
-			return false;
-		}
-	}
-	
+app.use('/app', express.static('./static/', {
+    extensions: ['html', 'htm']
+		}));
+app.use('/lib', express.static('./lib'));
+app.use('/dist', express.static('./dist'));
+//app.use('/app', express.static('./static/'));
 
-}
+server.listen(9000, function() {
+  console.log('listening on http://localhost:9000/app/client');
+});
+>>>>>>> parent of 59ef8ed... reworked jiff implementation, with github module, instad of the npm one
+
+var jiffServer = jiff.make_jiff(server, { logs:true });
 
 
-/*
 
-module.exports = function () {
-	this.name = 'GeeksforGeeks';
-	this.website = 'https://geeksforgeeks.org';
-	this.info = () => {
-		console.log(`Company name - ${this.name}`);
-		console.log(`Website - ${this.website}`);
-	}
-}
-
-*/
