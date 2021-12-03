@@ -12,12 +12,19 @@
 		var shares = mpc_istance.jiffClient.share(value);
 		var pre_result = shares[1].eq(shares[2]);
 		//if there are more than 2 parties, the computation checks if all inputs are equal
-		for (i=3;i<=mpc_istance.party_count;i++){
+		for (i=3;i<=mpc_istance.jiffClient.party_count;i++){
 			pre_result = pre_result.mult(shares[1].eq(shares[i]));
 		}
 		var result = mpc_istance.jiffClient.open(pre_result);
 		
 		return result;
+	}
+	
+	
+	
+	//Funtions for jigg
+	function getCircuit(circuit){
+		return $.ajax('/jigg_circuits/' + circuit);
 	}
 	
 	//jigg comparison utility
@@ -28,76 +35,6 @@
 				});
 		return b_list;
 	}	
-	
-	//quicksort utility
-	function swap(items, leftIndex, rightIndex){
-			var temp = items[leftIndex];
-			items[leftIndex] = items[rightIndex];
-			items[rightIndex] = temp;
-	}
-	//quicksort utility
-	function partition(items, left, right) {
-			var pivot   = items[Math.floor((right + left) / 2)], //middle element
-					i       = left, //left pointer
-					j       = right; //right pointer
-			while (i <= j) {
-					while (items[i].lt(pivot)) {
-							i++;
-					}
-					while (items[j].gt(pivot)) {
-							j--;
-					}
-					if (i <= j) {
-							swap(items, i, j); //sawpping two elements
-							i++;
-							j--;
-					}
-			}
-			return i;
-	}
-	
-	//implementation of quicksort
-	function jiffQuickSort(items, left, right) {
-			var index;
-			if (items.length > 1) {
-					index = partition(items, left, right); //index returned from partition
-					if (left < index - 1) { //more elements on the left side of the pivot
-							jiffQuickSort(items, left, index - 1);
-					}
-					if (index < right) { //more elements on the right side of the pivot
-							jiffQuickSort(items, index, right);
-					}
-			}
-			return items;
-	}
-	
-	
-	// first call to quick sort
-	//var sortedArray = quickSort(items, 0, items.length - 1);
-	//console.log(sortedArray); //prints [2,3,5,6,7,9]
-	
-	
-	function jiff_comparison_comp(mpc_istance, value){
-		var shares = mpc_istance.jiffClient.share(value);
-		
-		//add an id to the shares, associtates to their holder, to retrive their sorting later.
-		for (i=1;i<=mpc_istance.party_count;i++){
-			shares[i].id = i;
-		}
-		var pre_result = jiffQuickSort(shares,1,mpc_istance.party_count);
-		
-		
-		var result = mpc_istance.jiffClient.open(pre_result);
-		
-		return result;
-	}
-	
-	
-	//Funtions for jigg
-	function getCircuit(circuit){
-		return $.ajax('/jigg_circuits/' + circuit);
-	}
-	
 	
 	
 	function init_simple_mpc(hostname, party_count, comp_id, implementation='jiff', port=0){
@@ -154,7 +91,7 @@
 				mpc.party_id = mpc.jiffClient.id;
 				
 				//for jiff performance 
-				mpc.jiffClient.options.url = "/app/sound.mp3";
+				mpc.jiffClient.apply_extension(jiff_performance, { elementId: 'perfDiv', url: "/lib/sound.mp3" });		
 				
 				mpc.connected = true;
 				return mpc.jiffClient;
@@ -224,7 +161,7 @@
 						inputs.push(...pad);
 						inputs = inputs.slice(0,32)
 						
-						const circuit = getCircuit("32bitcomparator.txt");
+						const circuit = getCircuit("32bitequality.txt");
 						
 						if (mpc.jiggClient == null || mpc.connected == false)
 							mpc.connect();
@@ -258,27 +195,123 @@
 		}
 		
 		
+		//private functions utility for jiff sorting
+		//
+		//swap a and b in place, if a is greater than b_list
+		//then the lower element is in a position, and the greater of the two is in b position.
+		var compareAndExchange = function(a,b){
+			if(b>= mpc.sort_arr_conc.length) //if b is not >= arr length, so also a's not
+				return;
+			else{
+				var a_greater = mpc.sort_arr_conc[a].gt(mpc.sort_arr_conc[b]);
+				var greater_val = (a_greater.mult(mpc.sort_arr_conc[a])).add(a_greater.not().mult(mpc.sort_arr_conc[b]));
+				var lower_val = (a_greater.mult(mpc.sort_arr_conc[b])).add(a_greater.not().mult(mpc.sort_arr_conc[a]));
+				mpc.sort_arr_conc[a] = lower_val;
+				mpc.sort_arr_conc[b] = greater_val;
+			}
+		}
+		
+			//SORTING NETWORK
+			//
+			//input: sequence with the two halves sorted (st = start position in array; 
+			//			 n = number of elements to sort from st; dist = distance of elements to compare)
+			//output: two halves merged and sorted
+			var odd_evenMerge = function(st, n, dist){
+				if(n > 2){
+					odd_evenMerge(st, n/2, dist*2);
+					odd_evenMerge(st+dist, n/2, dist*2);
+					for(i=st+dist; i<(n*dist)+st-dist; i+=(dist*2))
+						compareAndExchange(i, i+dist);
+				}
+				else if (n == 2)
+					compareAndExchange(st, st+dist);
+			}
+			
+			//input: sequence of numbers (st = start position in array; n = number of elements to sort from st)
+			//output sequence sorted
+			//NOTE: works only with 2^n number of elements
+			var odd_evenMergeSort = function(st, n){
+				if (n > 1){
+					odd_evenMergeSort(st, n/2);
+					odd_evenMergeSort(st+n/2, n/2);
+					odd_evenMerge(st, n, 1);
+				}
+			}
+		
+		
+		//jiff sorting
+		var jiff_sorting = function(inputs){
+			
+			// final answer of this function here
+			var deferred = $.Deferred();
+			
+			//step 1: padding.  This step has the goal of hiding parties's input lengths
+			var shares = mpc.jiffClient.share(inputs.length);
+			var inputs_len_shr = shares[1];
+			for (i=2;i<=mpc.jiffClient.party_count;i++){
+				inputs_len_shr = inputs_len_shr.add(shares[i]);
+			}
+			var inputs_len = mpc.jiffClient.open(inputs_len_shr);
+			
+			inputs_len.then(function(len){
+				var pad = new Array(len-inputs.length).fill(0);
+				var my_inputs = inputs;
+				my_inputs.push(...pad);
+
+				//step 2: compute sorting
+				var arr_shares = mpc.jiffClient.share_array(my_inputs);
+				var arrays_cocat;
+				arr_shares.then(function(arrays_shares){
+					arrays_cocat = arrays_shares[1];
+					for(i=2; i<=mpc.jiffClient.party_count; i++){
+						arrays_cocat.push(...arrays_shares[i]);
+					}
+					//mpc.sort_arr_conc = arrs[1];
+					//mpc.sort_arr_conc.push(...arrs[2]);
+					mpc.sort_arr_conc = arrays_cocat;
+					
+					// call sorting netowrk with params: start_position = 0, size = least power of two greater than array length;
+					odd_evenMergeSort(0, 1 << 32 - Math.clz32(mpc.sort_arr_conc.length)); 
+					
+					var result = mpc.jiffClient.open_array(mpc.sort_arr_conc.slice(mpc.sort_arr_conc.length-len, mpc.sort_arr_conc.length));
+					result.then(function(res){
+						deferred.resolve(res);
+					});			
+				});
+			});
+			
+			return deferred.promise();
+			
+		}
+		
+		
+		
+		
 		/**
-     * Compute comparison for the given simple mpc instance
-     * @method compute_comparison
+     * Compute sorting for the given simple mpc instance
+     * @method compute_sorting
      * @memberof simple_mpc.mpc
      * @instance
-     * @param {integer} value - the value used as this party input in the comparison
+     * @param {integer} value - the value used as this party input in the sorting
      * @returns {Ppromise Object} promise - promise to the result of the computation;
-		 *					the result is 1 if all element are equals, 0 if party's element is the
-		 *					smallest, 2 if party's element is the biggest, 3 if there are more than
-		 * 					two parties, and the party's element isn't the biggest, nor the
-		 *					smallest, nor it's equal to all other parties inputs
+		 *					?
+		 ?
+		 ?
+		 ?
 		 *					 
-     */
-		mpc.compute_comparison = function(value){
+     */ 
+		 //TODO
+		mpc.compute_sorting = function(value){
+			if(value.some(isNaN))
+				throw new Error('compute_sorting accepts an array of only positive integer values');
+			
 			//jiff comparison implementation
 			if(implementation === 'jiff'){
 				return promise = new Promise(function(resolve, reject) {
 					try{
 						//what to do after connection (i.e implementation of comparison operation)
 						mpc.options.onConnect = function () {
-							mpc.result = jiff_comparison_comp(mpc, value);
+							mpc.result = jiff_sorting(value);
 							resolve(mpc.result);
 						};
 						if (mpc.jiffClient == null)
@@ -286,7 +319,7 @@
 							mpc.connect();
 						else //else trigger directly the function to compute
 						{
-							mpc.result = jiff_comparison_comp(mpc, value);	
+							mpc.result = jiff_sorting(value);
 							resolve(mpc.result);
 						}
 					}catch(err){
@@ -295,6 +328,15 @@
 				});//end promise
 			}//end jiff case
 			
+			else if (implementation === 'jigg'){
+				return promise = new Promise(function(resolve, reject) {
+					try{
+						resolve(mpc.result); //todo....
+					}catch(err){
+						reject(err);
+					}
+				});//end promise
+			}//end jigg case
 			
 		}
 		

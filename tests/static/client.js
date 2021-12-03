@@ -19,10 +19,11 @@ function onConnect(){
 function connect(callback) {	
 
 	$('#connectButton').prop('disabled', true);
-	jiff_test = simple_mpc.init_simple_mpc('localhost',2, $('#comp_id').val(), $('#implems').val());
+	jiff_test = simple_mpc.init_simple_mpc('localhost',$('#num_parties').val(), $('#comp_id').val(), $('#implems').val());
 	if($('#implems').val() == 'jigg')
 		jiff_test.jigg_role = $('#comp_id').val();
 	$('#button1').prop('disabled', false);
+	$('#button2').prop('disabled', false);
 	
 	//if(callback != null)
 		//callback();
@@ -36,15 +37,26 @@ function computeEquality(){
 			console.log("all the elements given in input from parties are equal!");
 		else if(res == 0)
 			console.log("the elements given in input from parties aren't equal.");
-		else if(res == 2)
-			console.log("a is greater than b");
-		else if(res == 3)
-			console.log("b is greater than a");
 		else
 			console.log("some error occoured in the computation");		
 	});
 		
 }
+
+function computeSorting(){
+	
+	input_arr = $('#array1').val().replace(/\s/g, '').replace('[','').split(',')
+	input_arr.forEach(function(elm, index){
+		input_arr[index] = parseInt(elm);
+	});
+	result = jiff_test.compute_sorting(input_arr);
+	result.then(function(res){
+		console.log('the array of all parties inputs is the followning: ');
+		console.log(res);
+	});
+		
+}
+
 
 function notify(){
 	if(jiffClient.isInitialized()){
