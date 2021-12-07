@@ -1,0 +1,8 @@
+5 176
+1 64
+1 64
+32 32 [0:7] [16:23] [32:39] [48:55] [112:119] [72:79] [88:95] [104:111] ./odd_evenMerge4val_8bit.casm #even sequence
+32 32 [8:15] [24:31] [40:47] [56:63] [64:71] [80:87] [96:103] [168:175] ./odd_evenMerge4val_8bit.casm #odd sequence
+16 16 [64:79] [120:135] ./compare_exchange.casm
+16 16 [80:95] [136:151] ./compare_exchange.casm
+16 16 [96:111] [152:167] ./compare_exchange.casm

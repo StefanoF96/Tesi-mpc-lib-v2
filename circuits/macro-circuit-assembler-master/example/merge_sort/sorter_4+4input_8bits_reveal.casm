@@ -1,0 +1,8 @@
+#input garbler:   [0:7][8:15][16:23][24:31] 
+#input evaluator: [32:39][40:47][48:55][56:63] 
+3 192
+2 32 32
+1 64
+32 32 [0:31] [64:95] ./odd_evenMergeSort4val_8bit.casm
+32 32 [32:63] [96:127] ./odd_evenMergeSort4val_8bit.casm
+64 64 [64:127] [128:191] ./odd_evenMerge8val_8bit.casm

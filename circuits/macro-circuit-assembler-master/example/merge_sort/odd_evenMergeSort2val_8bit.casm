@@ -1,0 +1,6 @@
+1 32
+1 16
+1 16
+# half 1 and half 2 are sorted already, so apply odd_evenMerge2val
+# and swap if needed
+16 16 [0:15] [16:31] ./odd_evenMerge2val_8bit.casm

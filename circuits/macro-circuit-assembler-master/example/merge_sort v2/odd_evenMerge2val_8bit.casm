@@ -1,0 +1,5 @@
+1 44
+1 22
+1 22
+# needs only to apply compare_and_exchange
+22 22 [0:21] [22:43] ./compare_exchange.casm

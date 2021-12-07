@@ -27,7 +27,7 @@
 		return $.ajax('/jigg_circuits/' + circuit);
 	}
 	
-	//jigg comparison utility
+	//jigg utility
 	function dec_to_binlist(dec){
 		b_list = (dec >>> 0).toString(2).split('').reverse();
 		b_list.forEach(function (item, index) {
@@ -198,7 +198,7 @@
 		//private functions utility for jiff sorting
 		//
 		//swap a and b in place, if a is greater than b_list
-		//then the lower element is in a position, and the greater of the two is in b position.
+		//then the lower element is in position a, and the greater of the two is in position b.
 		var compareAndExchange = function(a,b){
 			if(b>= mpc.sort_arr_conc.length) //if b is not >= arr length, so also a's not
 				return;
@@ -331,10 +331,49 @@
 			else if (implementation === 'jigg'){
 				return promise = new Promise(function(resolve, reject) {
 					try{
-						resolve(mpc.result); //todo....
+						var inputs = [];
+						var pad = new Array(8).fill(0);
+						
+						value.forEach(function(val){
+							var new_input = dec_to_binlist(val);
+							new_input.push(...pad);
+							new_input = new_input.slice(0,8)
+							inputs.push(...new_input);
+						}); 
+						
+						//push my input positions in input array
+						if(mpc.jigg_role == 'Garbler')
+							inputs.push(...[0,0,0,0,0,1,0,1,0,0,1,1]);
+						else if (mpc.jigg_role == 'Evaluator')
+							inputs.push(...[1,0,0,1,0,1,1,1,0,1,1,1]);
+						
+						const circuit = getCircuit("sorter_4+4input_8bits_new.txt");
+						
+						if (mpc.jiggClient == null || mpc.connected == false)
+							mpc.connect();
+						
+						circuit.then(function(circuit){
+							mpc.jiggClient.loadCircuit(circuit);
+							mpc.jiggClient.setInput(inputs);
+
+							// display progress and output
+							mpc.jiggClient.addProgressListener(function (status, currentGate, totalGates, error) {
+									console.log(status, currentGate, totalGates, error);
+							});
+							mpc.result=	mpc.jiggClient.getOutput();
+							resolve(mpc.result);
+							mpc.jiggClient.getOutput().then(function (outputs) {
+								console.log('Output', outputs);
+								mpc.jiggClient.disconnect(); // close the connection
+								mpc.connected = false;
+							});
+
+							// start
+							mpc.jiggClient.start();
+						});
 					}catch(err){
 						reject(err);
-					}
+					}		
 				});//end promise
 			}//end jigg case
 			

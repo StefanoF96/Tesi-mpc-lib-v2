@@ -1,0 +1,12 @@
+#298 gates circa
+8 66 
+2 8 8 # [0:7] = a; [8:15] = b
+2 8 8
+16 1 [0:15] 16 ./greater_than_8bit.txt #a greater
+1 1 16 17 INV # b greater (or equal)
+9 8 [0:7] 16 [18:25] ./8bit_mult_1bit.txt
+9 8 [8:15] 17 [26:33] ./8bit_mult_1bit.txt
+16 8 [18:33] [58:65] ./8bit_adder_with_a_0.casm #greater val
+9 8 [0:7] 17 [34:41] ./8bit_mult_1bit.txt 
+9 8 [8:15] 16 [42:49] ./8bit_mult_1bit.txt 
+16 8 [34:49] [50:57] ./8bit_adder_with_a_0.casm #lower val

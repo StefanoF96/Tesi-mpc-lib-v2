@@ -1,0 +1,6 @@
+3 132
+1 44
+1 44
+22 22 [0:15] [32:37] [44:65] ./odd_evenMergeSort2val_8bit.casm
+22 22 [16:31] [38:43] [66:87] ./odd_evenMergeSort2val_8bit.casm
+44 44 [44:59] [66:81] [60:65] [82:87] [88:131] ./odd_evenMerge4val_8bit.casm
