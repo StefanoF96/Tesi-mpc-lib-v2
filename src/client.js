@@ -70,7 +70,7 @@
     };
 		mpc.options.crypto_provider = true;		
 		
-		//NO ENCRYPTION, FOR DEBUG ONLY!!!
+		//NO ENCRYPTION, SET TO TRUE FOR DEBUG ONLY!!!
 		mpc.options.sodium = false;
 		
 		/**
@@ -204,10 +204,17 @@
 				return;
 			else{
 				var a_greater = mpc.sort_arr_conc[a].gt(mpc.sort_arr_conc[b]);
+				//values
 				var greater_val = (a_greater.mult(mpc.sort_arr_conc[a])).add(a_greater.not().mult(mpc.sort_arr_conc[b]));
 				var lower_val = (a_greater.mult(mpc.sort_arr_conc[b])).add(a_greater.not().mult(mpc.sort_arr_conc[a]));
+				//positions
+				var greater = (a_greater.mult(mpc.sort_arr_conc_key[a])).add(a_greater.not().mult(mpc.sort_arr_conc_key[b]));
+				var lower = (a_greater.mult(mpc.sort_arr_conc_key[b])).add(a_greater.not().mult(mpc.sort_arr_conc_key[a]));
+
 				mpc.sort_arr_conc[a] = lower_val;
 				mpc.sort_arr_conc[b] = greater_val;
+				mpc.sort_arr_conc_key[a] = lower;
+				mpc.sort_arr_conc_key[b] = greater;
 			}
 		}
 		
@@ -261,21 +268,33 @@
 				//step 2: compute sorting
 				var arr_shares = mpc.jiffClient.share_array(my_inputs);
 				var arrays_cocat;
-				arr_shares.then(function(arrays_shares){
+				var array_positions = []; 
+				arr_shares.then(function(arrays_shares){	
 					arrays_cocat = arrays_shares[1];
+					//enumerate positions of elements
+					pos = 0;
+					for(i=0; i<arrays_shares[1].length; i++){
+						pos+=1;
+						array_positions.push(pos);
+					}
 					for(i=2; i<=mpc.jiffClient.party_count; i++){
 						arrays_cocat.push(...arrays_shares[i]);
+						for(j=0; j<arrays_shares[i].length; j++){
+						pos+=1;
+						array_positions.push(pos);
+					}
 					}
 					//mpc.sort_arr_conc = arrs[1];
 					//mpc.sort_arr_conc.push(...arrs[2]);
 					mpc.sort_arr_conc = arrays_cocat;
+					mpc.sort_arr_conc_key = array_positions;
 					
 					// call sorting netowrk with params: start_position = 0, size = least power of two greater than array length;
 					odd_evenMergeSort(0, 1 << 32 - Math.clz32(mpc.sort_arr_conc.length)); 
 					
-					var result = mpc.jiffClient.open_array(mpc.sort_arr_conc.slice(mpc.sort_arr_conc.length-len, mpc.sort_arr_conc.length));
+					var result = mpc.jiffClient.open_array(mpc.sort_arr_conc_key.slice(mpc.sort_arr_conc_key.length-len, mpc.sort_arr_conc_key.length));
 					result.then(function(res){
-						deferred.resolve(res);
+						deferred.resolve(len,res);
 					});			
 				});
 			});
