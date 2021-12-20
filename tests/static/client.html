@@ -24,8 +24,10 @@
     </br></br></br></br></br>
 		<label for="number1">Number to compare<label> <input id="number1" onkeyup="EnableDisable(this,'button1')"> &nbsp; 
 		<button onclick="computeEquality();" disabled="disabled" id="button1">Submit</button><br/>
-		<label for="array1">numbers to sort<label> <input id="array1" onkeyup="EnableDisable(this,'button1')"> &nbsp; 
+		<label for="array1">numbers to sort<label> <input id="array1" onkeyup="EnableDisable(this,'button2')"> &nbsp; 
 		<button onclick="computeSorting();" disabled="disabled" id="button2">Submit</button><br/>
+		<label for="array2">numbers to intersect<label> <input id="array2" onkeyup="EnableDisable(this,'button3')"> &nbsp; 
+		<button onclick="computeSetIntersection();" disabled="disabled" id="button3">Submit</button><br/>
 		</br>
 		<div style="background-color: black; color:#73f273; padding-top: 3px; width:50%; max-height:500px; overflow:auto" id="output"></div>
 		<div id = "perfDiv"></div> <!--for jiff performance-->

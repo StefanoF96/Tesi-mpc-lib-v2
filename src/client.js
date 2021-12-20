@@ -98,7 +98,7 @@
 			}
 			//jigg
 			if(implementation === 'jigg'){
-				if (!mpc.jigg_role)
+				if (mpc.jigg_role != "Evaluator" && mpc.jigg_role != "Garbler")
 					throw new Error('mpc.jigg_role MUST be defined as Garbler or Evaluator');
 				if (mpc.port_flag == false){
 					mpc.hostname += ":" + 9001;
@@ -161,7 +161,7 @@
 						inputs.push(...pad);
 						inputs = inputs.slice(0,32)
 						
-						const circuit = getCircuit("32bitequality.txt");
+						const circuit = getCircuit("32bit_equality.txt");
 						
 						if (mpc.jiggClient == null || mpc.connected == false)
 							mpc.connect();
@@ -305,13 +305,12 @@
 		
 		
 		
-		
 		/**
      * Compute sorting for the given simple mpc instance
      * @method compute_sorting
      * @memberof simple_mpc.mpc
      * @instance
-     * @param {integer} value - the value used as this party input in the sorting
+     * @param {list[integer]} value - the list used as this party input in the sorting
      * @returns {Ppromise Object} promise - promise to the result of the computation;
 		 *					?
 		 ?
@@ -319,7 +318,6 @@
 		 ?
 		 *					 
      */ 
-		 //TODO
 		mpc.compute_sorting = function(value){
 			if(value.some(isNaN))
 				throw new Error('compute_sorting accepts an array of only positive integer values');
@@ -330,16 +328,22 @@
 					try{
 						//what to do after connection (i.e implementation of comparison operation)
 						mpc.options.onConnect = function () {
-							mpc.result = jiff_sorting(value);
-							resolve(mpc.result);
+							jiff_sorting(value).then(function(len,res){
+								mpc.result = res;
+								resolve(mpc.result);
+							});
 						};
 						if (mpc.jiffClient == null)
 							//connecting to jiff, when all parties are connected, triggers the callback above.
 							mpc.connect();
 						else //else trigger directly the function to compute
 						{
-							mpc.result = jiff_sorting(value);
-							resolve(mpc.result);
+							
+							jiff_sorting(value).then(function(len,res){
+								mpc.result = res;
+								resolve(mpc.result);
+							});
+							
 						}
 					}catch(err){
 						reject(err);
@@ -399,11 +403,159 @@
 		}
 		
 		
+		//jiff function for private set intersection
+		//using  Sort-Compare-Shuffle Algorithm
+		var jiff_intersection = function(inputs){
+			console.log("work in progress");
+			
+			
+			
+		}
+		
+		//utility jigg set intersection
+		// using Pairwise Comparisons Algorithm
+		/*
+		i,j = loop indexes
+		inputs = this party input list
+		matched = list of elements that matched	or not
+		result = list of mathced elements to return as result
+		*/
+		jigg_intersect_loop = function(i,j,inputs,matched,result){
+			
+			var deferred = $.Deferred();
+			mpc.connect();
+			
+			const circuit = getCircuit("32bit_equality.txt");
+			circuit.then(function(circuit){
+				mpc.jiggClient.loadCircuit(circuit);
+				
+				//set input
+				if(mpc.jigg_role == 'Garbler')
+					mpc.jiggClient.setInput(inputs[i],'number');
+				else if(mpc.jigg_role == 'Evaluator')
+					mpc.jiggClient.setInput(inputs[j],'number');
+				// start
+				mpc.jiggClient.start();
+				mpc.jiggClient.getOutput().then(function(output){
+					//add a little delay
+					setTimeout(function(){
+						console.log('Output', output);
+						
+						if((!matched[j]) && output == 1){
+							//garbler and evaluator pushes their input only
+							if(mpc.jigg_role == 'Garbler' && (!result.includes(inputs[i]))) //this prevent to insert duplicates in the intersection
+								result.push(inputs[i]);
+							else if(mpc.jigg_role == 'Evaluator' && (!result.includes(inputs[j]))) //this prevent to insert duplicates in the intersection
+								result.push(inputs[j]);
+					
+							matched[j] = true;
+						}
+						j+=1;
+						if(j>=inputs.length){
+							j = 0;
+							i+=1;
+						}
+						if(i<inputs.length){ //continue the loop
+							deferred.resolve(jigg_intersect_loop(i,j,inputs,matched,result));
+						}
+						else{
+							deferred.resolve(result);
+						}
+					},16) //delay (ms)
+				});
+			});
+			
+			return deferred.promise();
+		}
+		
+		//jigg function for private set intersection
+		var jigg_intersection = function(inputs){
+			// final answer of this function here
+			var deferred = $.Deferred();
+			
+			var matched = [];
+			var result = [];
+			
+			//init matched array
+			for(i=0; i<inputs.length; i++)
+				matched[i] = false;
+			
+			//here we simulate two for loops, with promis -> then sequences
+			//for(i=0; i<value.length; i++)
+			//	for(j=0; j<value.length; j++)
+			deferred.resolve(jigg_intersect_loop(0,0,inputs,matched,result));
+			
+			
+			return deferred.promise();	
+		}
 		
 		
-	//TODO: implementare funzione confronto e ugualianza per jigg
-	//TODO: al posto di comparazione come pensata fino ad ora, potrei fare ritornare una mappa con
-	//  		un ordinamento degli input dal più piccolo al più grande
+		
+		/**
+     * Compute private set intersection for the given simple mpc instance
+     * @method compute_sorting
+     * @memberof simple_mpc.mpc
+     * @instance
+     * @param {list[integer]} value - the list used as this party input in the intersection
+																			!!! all parties must provide lists of the same size
+     * @returns {Ppromise Object} promise - promise to the result of the computation;
+		 *					
+		 ?
+		 ?
+		 ?
+		 *					 
+     */ 
+		mpc.compute_intersection = function(value){
+			if(value.some(isNaN))
+				throw new Error('compute_intersection accepts an array of only positive integer values');
+			
+			//jiff implementation  WORK IN PROGRESS...
+			if(implementation === 'jiff'){
+				return promise = new Promise(function(resolve, reject) {
+					try{
+						//what to do after connection (i.e implementation of comparison operation)
+						
+						mpc.options.onConnect = function () {
+						
+							mpc.result = jiff_intersection(value);
+							resolve(mpc.result);
+						};
+						if (mpc.jiffClient == null)
+							//connecting to jiff, when all parties are connected, triggers the callback above.
+							mpc.connect();
+						else //else trigger directly the function to compute
+						{
+							mpc.result = jiff_intersection(value);
+							resolve(mpc.result);
+						}
+					}catch(err){
+						reject(err);
+					}
+				});//end promise
+			}//end jiff case
+			
+			else if (implementation === 'jigg'){
+				return promise = new Promise(function(resolve, reject) {
+					try{
+						/*var inputs = [];
+						var pad = new Array(32).fill(0);
+						value.forEach(function(val){
+							var new_input = dec_to_binlist(val);
+							new_input.push(...pad);
+							new_input = new_input.slice(0,32)
+							inputs.push(new_input);
+						}); */
+						
+						mpc.result = jigg_intersection(value);
+						resolve(mpc.result);
+			
+					}catch(err){
+						reject(err);
+					}		
+				});//end promise
+			}//end jigg case
+			
+		}
 		
 		
 		return mpc;		

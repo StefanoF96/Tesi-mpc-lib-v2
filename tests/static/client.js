@@ -24,6 +24,8 @@ function connect(callback) {
 		jiff_test.jigg_role = $('#comp_id').val();
 	$('#button1').prop('disabled', false);
 	$('#button2').prop('disabled', false);
+	$('#button3').prop('disabled', false);
+
 	
 	//if(callback != null)
 		//callback();
@@ -44,7 +46,6 @@ function computeEquality(){
 }
 
 function computeSorting(){
-	
 	input_arr = $('#array1').val().replace(/\s/g, '').replace('[','').split(',')
 	input_arr.forEach(function(elm, index){
 		input_arr[index] = parseInt(elm);
@@ -54,9 +55,20 @@ function computeSorting(){
 		console.log('the array of all parties inputs is the followning: ');
 		console.log(res);
 	});
-		
 }
 
+function computeSetIntersection(){
+	input_arr = $('#array2').val().replace(/\s/g, '').replace('[','').split(',')
+	input_arr.forEach(function(elm, index){
+		input_arr[index] = parseInt(elm);
+	});
+	result = jiff_test.compute_intersection(input_arr);
+	result.then(function(res){
+		console.log('the element in the intersection are: ');
+		console.log(res);
+	});
+}
+		
 
 function notify(){
 	if(jiffClient.isInitialized()){
