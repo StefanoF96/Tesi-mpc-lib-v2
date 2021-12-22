@@ -194,15 +194,20 @@
 				return 0;
 		}
 		
-		
+		mpc.counter = 0;
 		//private functions utility for jiff sorting
 		//
 		//swap a and b in place, if a is greater than b_list
 		//then the lower element is in position a, and the greater of the two is in position b.
 		var compareAndExchange = function(a,b){
-			if(b>= mpc.sort_arr_conc.length) //if b is not >= arr length, so also a's not
+
+			if(b>= mpc.sort_arr_conc.length) //if b is not >= arr length, we are out of range
 				return;
 			else{
+				//debug 
+				mpc.counter+=1;
+				console.log("compare exchange counter: " + mpc.counter);
+				console.log("a: " + a + " b: " + b);
 				var a_greater = mpc.sort_arr_conc[a].gt(mpc.sort_arr_conc[b]);
 				//values
 				var greater_val = (a_greater.mult(mpc.sort_arr_conc[a])).add(a_greater.not().mult(mpc.sort_arr_conc[b]));
@@ -264,43 +269,52 @@
 				var pad = new Array(len-inputs.length).fill(0);
 				var my_inputs = inputs;
 				my_inputs.push(...pad);
-
+				
+				//DEBUG
+				console.log("DEBUG: step 1 done");
 				//step 2: compute sorting
 				var arr_shares = mpc.jiffClient.share_array(my_inputs);
 				var arrays_cocat;
-				var array_positions = []; 
+				var array_positions_keys = []; 
 				arr_shares.then(function(arrays_shares){	
 					arrays_cocat = arrays_shares[1];
 					//enumerate positions of elements
 					pos = 0;
 					for(i=0; i<arrays_shares[1].length; i++){
 						pos+=1;
-						array_positions.push(pos);
+						array_positions_keys.push(pos);
 					}
+					//pushing for each pary his shares in a concatenated array
 					for(i=2; i<=mpc.jiffClient.party_count; i++){
 						arrays_cocat.push(...arrays_shares[i]);
+						//pushing one by one the indexes of each party in a concatenated array
 						for(j=0; j<arrays_shares[i].length; j++){
-						pos+=1;
-						array_positions.push(pos);
+							pos+=1;
+							array_positions_keys.push(pos);
+						}
 					}
-					}
-					//mpc.sort_arr_conc = arrs[1];
-					//mpc.sort_arr_conc.push(...arrs[2]);
+					
+					//we need to put the shares in object varibles, to use them in sorting algorithms above.
 					mpc.sort_arr_conc = arrays_cocat;
-					mpc.sort_arr_conc_key = array_positions;
+					mpc.sort_arr_conc_key = array_positions_keys;
 					
 					// call sorting netowrk with params: start_position = 0, size = least power of two greater than array length;
 					odd_evenMergeSort(0, 1 << 32 - Math.clz32(mpc.sort_arr_conc.length)); 
+					//DEBUG
+					console.log("DEBUG: sorting done, opening results..");
 					
 					var result = mpc.jiffClient.open_array(mpc.sort_arr_conc_key.slice(mpc.sort_arr_conc_key.length-len, mpc.sort_arr_conc_key.length));
 					result.then(function(res){
-						deferred.resolve(len,res);
+						deferred.resolve(len,res,mpc.sort_arr_conc.slice(mpc.sort_arr_conc.length-len, mpc.sort_arr_conc.length));
 					});			
 				});
 			});
 			
-			return deferred.promise();
-			
+			return deferred.promise(); 
+			//promise contains: 
+			// - length of the concatenation of all inputs 
+			// - an array with the positions of inputs keys sorted (the result)
+			// - an array containing the values, still in shared form sorted (for set intersection)
 		}
 		
 		
@@ -402,14 +416,36 @@
 			
 		}
 		
+		//jiff functions for private set intersection
+		var DupSelect_2 = function(share1,share2){
+			var matching = share1.eq(share2);
+			return share1.mult(matching);
+		}
 		
-		//jiff function for private set intersection
-		//using  Sort-Compare-Shuffle Algorithm
+		
+		//PSI using  Sort-Compare-Shuffle Algorithm
 		var jiff_intersection = function(inputs){
-			console.log("work in progress");
-			
-			
-			
+			var deferred = $.Deferred();
+			mpc.intersection_res = [];
+			jiff_sorting(inputs).then(function(len,positions,val_shares){
+				console.log("DEBUG: sorting done!");
+				for(i=0; i<len-1; i++){
+					mpc.intersection_res.push(DupSelect_2(val_shares[i],val_shares[i+1]));
+				}
+				//open result
+				var result = mpc.jiffClient.open_array(mpc.intersection_res);
+				result.then(function(res){
+					console.log("DEBUG: filtering done!");
+					res = res.filter(function(a){return a !== 0}); //remove zero values
+					var unique_res = [];
+					//remove dupplicates in result
+					$.each(res, function(i, el){
+							if($.inArray(el, unique_res) === -1) unique_res.push(el);
+					});
+					deferred.resolve(unique_res);
+				});
+			});
+			return deferred.promise();
 		}
 		
 		//utility jigg set intersection
