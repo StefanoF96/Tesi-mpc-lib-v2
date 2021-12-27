@@ -20,6 +20,20 @@
 		return result;
 	}
 	
+	//utility ysed to reveal my input array size
+	//put in result_sizes_arr, the input sizes of each party
+	function revealInputSizes(mpc_istance, size, result_sizes_arr){
+		if (result_sizes_arr == null || result_sizes_arr.length == 0){
+			for(i=0; i<mpc_istance.party_count; i++)
+				result_sizes_arr.push(null);
+		}
+		mpc_istance.emit("input_size", null,size.toString(),false);
+		mpc_istance.listen("input_size", function(id,msg){
+				console.log("incoming from " + id + ": " + msg);
+				result_sizes_arr[id-1] = parseInt(msg);
+		});
+		
+	}
 	
 	
 	//Funtions for jigg
@@ -369,12 +383,12 @@
 				return promise = new Promise(function(resolve, reject) {
 					try{
 						var inputs = [];
-						var pad = new Array(8).fill(0);
+						var pad = new Array(32).fill(0);
 						
 						value.forEach(function(val){
 							var new_input = dec_to_binlist(val);
 							new_input.push(...pad);
-							new_input = new_input.slice(0,8)
+							new_input = new_input.slice(0,32)
 							inputs.push(...new_input);
 						}); 
 						
@@ -384,7 +398,7 @@
 						else if (mpc.jigg_role == 'Evaluator')
 							inputs.push(...[1,0,0,1,0,1,1,1,0,1,1,1]);
 						
-						const circuit = getCircuit("sorter_4+4input_8bits_new.txt");
+						const circuit = getCircuit("sorter_4+4input_32bits(from_compiler).txt");
 						
 						if (mpc.jiggClient == null || mpc.connected == false)
 							mpc.connect();
@@ -397,12 +411,19 @@
 							mpc.jiggClient.addProgressListener(function (status, currentGate, totalGates, error) {
 									console.log(status, currentGate, totalGates, error);
 							});
-							mpc.result=	mpc.jiggClient.getOutput();
-							resolve(mpc.result);
+							
 							mpc.jiggClient.getOutput().then(function (outputs) {
 								console.log('Output', outputs);
 								mpc.jiggClient.disconnect(); // close the connection
 								mpc.connected = false;
+								
+								res =	outputs;
+								mpc.result = [];
+								for(i=0; i<24; i+=3){
+									mpc.result.push(parseInt(res.slice(i,i+3).join(''), 2));
+								}
+								//return result
+								resolve(mpc.result);
 							});
 
 							// start
@@ -416,17 +437,130 @@
 			
 		}
 		
-		//jiff functions for private set intersection
+		//_____________________________________________________________________
+		//function 3: set intersection
+		
+		//check equality from selected indexes, and push in result the element if all equal, or 0 otherwise
+		// shares | Array<SecretShares> | contain the shares of the inputs
+		// shares_indexes | Array<int> | contains the indexes on wich perform the equality check
+		// result | Array<SecretShares> | result in secret shared form
+		function shares_list_equality(shares,shares_indexes,result){
+			var pre_result = shares[1][shares_indexes[0]].eq(shares[2][shares_indexes[1]]);
+			//if there are more than 2 parties, the computation checks if all inputs are equal
+			for (i=3;i<=mpc.jiffClient.party_count;i++){
+				pre_result = pre_result.mult(shares[1][shares_indexes[0]].eq(shares[i][shares_indexes[i-1]]));
+			}
+			
+			result.push(shares[1][shares_indexes[0]].mult(pre_result));
+			
+		}
+		
+		//utility for PairwiseComparison in JIFF
+		//this function create N nested for loops (one for each parties)
+		// shares = SecretShare | the secret shares arrays used to perform the secure computation
+		// tot_loops = int | the number of nested for loops desired
+		// iterations_nums = Array<int> | an array where each element specifies the number of iterations of the i-th element
+		// indexes = Array<int> | an array where each element is an index of the loop --- init always with [0,0, ..., 0]
+		// result = Array<int> | array containing all elements in the intersection --- init always with []
+		var recursivePairwiseComparisons = function(shares,tot_loops,iterations_nums,indexes,result){
+			var N = iterations_nums[0];
+			iterations_nums = iterations_nums.slice(1,iterations_nums.length);
+			for(var i=0; i<N; i++){
+				console.log(N);
+				indexes[tot_loops - iterations_nums.length -1] = i;
+				if(iterations_nums.length > 0)
+					recursivePairwiseComparisons(shares,tot_loops,iterations_nums,indexes,result);
+				else{
+					//here the code that should be inside the last nested loop
+					console.log(indexes);
+					//check equality from selected indexes, and push in result the element if all equal, or 0 otherwise
+					shares_list_equality(shares,indexes,result);
+				}
+			}
+		}
+		
+		
+		var jiff_pairwiseComparisons = function(shares, iterations_nums, result){
+			
+			indexes_array = [];
+			for(i=0; i<mpc.jiffClient.party_count; i++)
+				indexes_array.push(0);
+			
+			recursivePairwiseComparisons(shares,mpc.jiffClient.party_count,iterations_nums,indexes_array,result);
+			
+		}
+		
+		
+		/*
+		Algorithm 1 PairwiseComparisons(S, S0)
+		1: for i 1 to S0:size do
+		2: matched[i] False
+		3:
+		4: for i 1 to S:size do
+		5: for j 1 to S0:size do
+		6: if :matched[j] and	Equal(S[i];S0[j])	then
+		7: reveal(S[i])
+		8: matched[j] True
+		9: break
+		*/
+		//PSI using PairwiseComparisons
+		
+		mpc.array_sizes = [];
+		
+		var jiff_intersection_1 = function(inputs){
+			
+			var deferred = $.Deferred();
+			mpc.intersection_res = [];
+			
+			//step 1: reveal input sizes in plain text
+			revealInputSizes(mpc.jiffClient,inputs.length,mpc.array_sizes);
+			
+			//step 2 share inputs in secret shared form
+			var arr_shares = mpc.jiffClient.share_array(inputs);
+			
+			arr_shares.then(function(arrays_shares){
+				jiff_pairwiseComparisons(arrays_shares, mpc.array_sizes, mpc.intersection_res);
+				
+				//open result
+				var result = mpc.jiffClient.open_array(mpc.intersection_res);
+				result.then(function(res){
+					res = res.filter(function(a){return a !== 0}); //remove zero values
+					var unique_res = [];
+					//remove dupplicates in result
+					$.each(res, function(i, el){
+							if($.inArray(el, unique_res) === -1) unique_res.push(el);
+					});
+					deferred.resolve(unique_res);
+				});
+			});			
+			
+			//open result
+			/*var result = mpc.jiffClient.open_array(mpc.intersection_res);
+			result.then(function(res){
+				console.log("DEBUG: filtering done!");
+				res = res.filter(function(a){return a !== 0}); //remove zero values
+				var unique_res = [];
+				//remove dupplicates in result
+				$.each(res, function(i, el){
+						if($.inArray(el, unique_res) === -1) unique_res.push(el);
+				});
+				deferred.resolve(unique_res);
+			});
+			*/
+			return deferred.promise();
+		}
+		
+		//jiff functions for private set intersection_2(Sort-Compare-Shuffle) ... it works only for two-party
 		var DupSelect_2 = function(share1,share2){
 			var matching = share1.eq(share2);
 			return share1.mult(matching);
 		}
 		
-		
 		//PSI using  Sort-Compare-Shuffle Algorithm
-		var jiff_intersection = function(inputs){
+		var jiff_intersection_2 = function(inputs){
 			var deferred = $.Deferred();
 			mpc.intersection_res = [];
+			//this algorithm needs to sort first.
 			jiff_sorting(inputs).then(function(len,positions,val_shares){
 				console.log("DEBUG: sorting done!");
 				for(i=0; i<len-1; i++){
@@ -450,12 +584,10 @@
 		
 		//utility jigg set intersection
 		// using Pairwise Comparisons Algorithm
-		/*
-		i,j = loop indexes
-		inputs = this party input list
-		matched = list of elements that matched	or not
-		result = list of mathced elements to return as result
-		*/
+		/*	i,j = loop indexes
+				inputs = this party input list
+				matched = list of elements that matched	or not
+				result = list of mathced elements to return as result */
 		jigg_intersect_loop = function(i,j,inputs,matched,result){
 			
 			var deferred = $.Deferred();
@@ -497,15 +629,15 @@
 						else{
 							deferred.resolve(result);
 						}
-					},16) //delay (ms)
+					},33) //delay (ms)
 				});
 			});
 			
 			return deferred.promise();
 		}
 		
-		//jigg function for private set intersection
-		var jigg_intersection = function(inputs){
+		//jigg function for private set intersection (PairwiseComparisons)
+		var jigg_intersection_1 = function(inputs){
 			// final answer of this function here
 			var deferred = $.Deferred();
 			
@@ -519,6 +651,13 @@
 			//here we simulate two for loops, with promis -> then sequences
 			//for(i=0; i<value.length; i++)
 			//	for(j=0; j<value.length; j++)
+			// <-***-><-***-><-***-><-***-><-***-><-***-><-***-><-***-><-***-><-***-><-***-><-***-><-***-><-***-><-***-><-***-><-***-><-***->
+			// <-***-> non posso usare due veri for loop, perchè per ogni ciclo, devo richimare un nuovo circuito,										<-***->
+			// <-***-> e attendere il risultato del precedente, prima di procedere a valutare gli elementi successivi,								<-***->
+			// <-***-> (altrimenti inserirei dupplicati nell'array result). Inoltre, i vari circuiti di compute_equality si 					<-***->
+			// <-***-> "incastrerebbero" tra di loro durante la computazione, e il server JIGG può gesirne uno solo alla volta... 		<-***->
+			// <-***-> PARALLELISMO DIFFICILE CON JIGG...... 																																					<-***->
+			// <-***-><-***-><-***-><-***-><-***-><-***-><-***-><-***-><-***-><-***-><-***-><-***-><-***-><-***-><-***-><-***-><-***-><-***->
 			deferred.resolve(jigg_intersect_loop(0,0,inputs,matched,result));
 			
 			
@@ -526,6 +665,68 @@
 		}
 		
 		
+		//jigg function for private set intersection part 2 (Sort-Compare-Shuffle)
+		var jigg_intersection_2 = function(user_inputs){
+			// final answer of this function here
+			var deferred = $.Deferred();
+			
+			/////////////////////
+			//////////////////////
+			var inputs = [];
+			var pad = new Array(32).fill(0);
+			
+			user_inputs.forEach(function(val){
+				var new_input = dec_to_binlist(val);
+				new_input.push(...pad);
+				new_input = new_input.slice(0,32)
+				inputs.push(...new_input);
+			}); 
+			
+			//push my input positions in input array
+			if(mpc.jigg_role == 'Garbler')
+				inputs.push(...[0,0,0,0,0,1,0,1,0,0,1,1]);
+			else if (mpc.jigg_role == 'Evaluator')
+				inputs.push(...[1,0,0,1,0,1,1,1,0,1,1,1]);
+			
+			const circuit = getCircuit("PSI(sort-comp-shuf)_4+4+inputs_32bit.txt");
+			
+			if (mpc.jiggClient == null || mpc.connected == false)
+				mpc.connect();
+			
+			circuit.then(function(circuit){
+				mpc.jiggClient.loadCircuit(circuit);
+				mpc.jiggClient.setInput(inputs);
+
+				// display progress and output
+				mpc.jiggClient.addProgressListener(function (status, currentGate, totalGates, error) {
+						console.log(status, currentGate, totalGates, error);
+				});
+				
+				mpc.jiggClient.getOutput().then(function (outputs) {
+					console.log('Output', outputs);
+					mpc.jiggClient.disconnect(); // close the connection
+					mpc.connected = false;
+					
+					res =	outputs;
+					mpc.result = [];
+					for(i=0; i<224; i+=32){
+						mpc.result.push(parseInt(res.slice(i,i+32).reverse().join(''), 2));
+					}
+					mpc.result = mpc.result.filter(function(a){return a !== 0}); //remove zero values
+					//return result
+					deferred.resolve(mpc.result);
+				});
+				// start
+				mpc.jiggClient.start();
+			});
+
+			///////////////////////
+			//////////////////////
+			
+			
+			
+			return deferred.promise();	
+		}
 		
 		/**
      * Compute private set intersection for the given simple mpc instance
@@ -535,6 +736,7 @@
      * @param {list[integer]} value - the list used as this party input in the intersection
 																			!!! all parties must provide lists of the same size
      * @returns {Ppromise Object} promise - promise to the result of the computation;
+		 *														the promise contains an array with elements in the intersection 
 		 *					
 		 ?
 		 ?
@@ -553,7 +755,7 @@
 						
 						mpc.options.onConnect = function () {
 						
-							mpc.result = jiff_intersection(value);
+							mpc.result = jiff_intersection_1(value); //switch version 1 or 2 here and below
 							resolve(mpc.result);
 						};
 						if (mpc.jiffClient == null)
@@ -561,7 +763,7 @@
 							mpc.connect();
 						else //else trigger directly the function to compute
 						{
-							mpc.result = jiff_intersection(value);
+							mpc.result = jiff_intersection_1(value); //switch version 1 or 2 here and above
 							resolve(mpc.result);
 						}
 					}catch(err){
@@ -582,7 +784,7 @@
 							inputs.push(new_input);
 						}); */
 						
-						mpc.result = jigg_intersection(value);
+						mpc.result = jigg_intersection_2(value);
 						resolve(mpc.result);
 			
 					}catch(err){

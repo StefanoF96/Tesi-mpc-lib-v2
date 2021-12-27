@@ -1,0 +1,17 @@
+14 282
+1 70
+1 70
+64 1 [0:63] 70 ./greater_than_32bit.casm
+1 1 70 71 INV
+33 32 [0:31] 70 [72:103] ./32bit_mult_1bit.txt
+33 32 [32:63] 71 [104:135] ./32bit_mult_1bit.txt
+64 32 [72:135] [244:275] ./32bit_adder_with_a_0.casm
+33 32 [0:31] 71 [136:167] ./32bit_mult_1bit.txt
+33 32 [32:63] 70 [168:199] ./32bit_mult_1bit.txt
+64 32 [136:199] [212:243] ./32bit_adder_with_a_0.casm
+4 3 [64:66] 70 [200:202] ./3bit_mult_1bit.txt
+4 3 [67:69] 71 [203:205] ./3bit_mult_1bit.txt
+6 3 [200:205] [279:281] ./3bit_adder_with_a_0.casm
+4 3 [64:66] 71 [206:208] ./3bit_mult_1bit.txt
+4 3 [67:69] 70 [209:211] ./3bit_mult_1bit.txt
+6 3 [206:211] [276:278] ./3bit_adder_with_a_0.casm

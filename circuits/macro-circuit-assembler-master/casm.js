@@ -110,7 +110,9 @@ function parseAndAssemble(inputPath) {
 if (require.main === module) {
   const inputPath = process.argv[2];
   const outputPath = process.argv[3];
-
+	
+	console.log(inputPath);
+	console.log(outputPath);
   const assembledString = parseAndAssemble(inputPath);
 
   if (outputPath) {

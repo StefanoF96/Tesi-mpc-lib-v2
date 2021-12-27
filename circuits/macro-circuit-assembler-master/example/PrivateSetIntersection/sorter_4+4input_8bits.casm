@@ -1,0 +1,6 @@
+3 264
+2 44 44
+1 24
+44 44 [0:43] [88:131] ./odd_evenMergeSort4val_8bit.casm
+44 44 [44:87] [132:175] ./odd_evenMergeSort4val_8bit.casm
+88 88 [88:119] [132:163] [120:131] [164:175] [176:263] ./odd_evenMerge8val_8bit.casm
