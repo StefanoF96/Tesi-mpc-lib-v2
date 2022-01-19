@@ -1,0 +1,6 @@
+3 936
+1 312
+1 312
+156 156 [0:127] [256:283] [312:467] ./odd_evenMergeSort4val_32bit.casm
+156 156 [128:255] [284:311] [468:623] ./odd_evenMergeSort4val_32bit.casm
+312 312 [312:439] [468:595] [440:467] [596:935] ./odd_evenMerge8val_32bit.casm

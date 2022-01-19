@@ -1,0 +1,6 @@
+3 1872
+1 624
+1 624
+312 312 [0:255] [512:567] [624:935] ./odd_evenMergeSort8val_32bit.casm
+312 312 [256:511] [568:623] [936:1247] ./odd_evenMergeSort8val_32bit.casm
+624 624 [624:879] [936:1191] [880:935] [1192:1871] ./odd_evenMerge16val_32bit.casm

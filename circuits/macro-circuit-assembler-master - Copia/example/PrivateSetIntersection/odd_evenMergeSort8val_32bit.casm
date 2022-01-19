@@ -1,0 +1,6 @@
+3 864
+1 288
+1 288
+144 144 [0:127] [256:271] [288:431] ./odd_evenMergeSort4val_32bit.casm
+144 144 [128:255] [272:287] [432:575] ./odd_evenMergeSort4val_32bit.casm
+288 288 [288:415] [432:559] [416:431] [560:863] ./odd_evenMerge8val_32bit.casm

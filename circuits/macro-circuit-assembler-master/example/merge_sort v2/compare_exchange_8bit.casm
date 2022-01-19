@@ -1,0 +1,17 @@
+14 90
+1 22
+1 22
+16 1 [0:15] 22 ./greater_than_8bit.casm
+1 1 22 23 INV
+9 8 [0:7] 22 [24:31] ./8bit_mult_1bit.txt
+9 8 [8:15] 23 [32:39] ./8bit_mult_1bit.txt
+16 8 [24:39] [76:83] ./8bit_adder_with_a_0.casm
+9 8 [0:7] 23 [40:47] ./8bit_mult_1bit.txt
+9 8 [8:15] 22 [48:55] ./8bit_mult_1bit.txt
+16 8 [40:55] [68:75] ./8bit_adder_with_a_0.casm
+4 3 [16:18] 22 [56:58] ./3bit_mult_1bit.txt
+4 3 [19:21] 23 [59:61] ./3bit_mult_1bit.txt
+6 3 [56:61] [87:89] ./3bit_adder_with_a_0.casm
+4 3 [16:18] 23 [62:64] ./3bit_mult_1bit.txt
+4 3 [19:21] 22 [65:67] ./3bit_mult_1bit.txt
+6 3 [62:67] [84:86] ./3bit_adder_with_a_0.casm

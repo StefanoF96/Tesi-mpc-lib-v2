@@ -1,0 +1,6 @@
+3 432
+1 144
+1 144
+72 72 [0:63] [128:135] [144:215] ./odd_evenMergeSort2val_32bit.casm
+72 72 [64:127] [136:143] [216:287] ./odd_evenMergeSort2val_32bit.casm
+144 144 [144:207] [216:279] [208:215] [280:431] ./odd_evenMerge4val_32bit.casm

@@ -1,0 +1,34 @@
+
+test_jiff_operations_times.js:25 sum test end, total time: 0.08719999999925494s
+test_jiff_operations_times.js:26 186
+test_jiff_operations_times.js:37 start multiplication test
+test_jiff_operations_times.js:44 multiplication test end, total time: 0.08059999999776482s
+test_jiff_operations_times.js:45 3629
+test_jiff_operations_times.js:56 greater-equal  test
+test_jiff_operations_times.js:63 greater-equal test end, total time: 3.905800000000745s
+test_jiff_operations_times.js:64 2478178539
+test_jiff_operations_times.js:75 greater-equal-costant  test
+test_jiff_operations_times.js:82 greater-equal-costant test end, total time: 2.66s
+test_jiff_operations_times.js:83 2346040593
+test_jiff_operations_times.js:94 equality test
+test_jiff_operations_times.js:101 equality test end, total time: 1.4086999999992549s
+test_jiff_operations_times.js:102 1146945347
+test_jiff_operations_times.js:113 division test
+test_jiff_operations_times.js:120 division test end, total time: 133.70709999999775s
+test_jiff_operations_times.js:121 1193012466
+test_jiff_operations_times.js:132 division-costant test
+test_jiff_operations_times.js:139 division-costant test end, total time: 10.26560000000149s
+
+
+
+42 compare exchange 2-party: 
+	sorting done in: 100.80460000000149s 
+	filtering done in: 3.5258999999985097s
+	
+90 compare exchange 3-party:
+	sorting done in: 469.07869999999923s
+	filtering done in: 11.77489999999851s
+	
+90 compare exchange 2-party:
+	sorting done in: 211.25589999999852s
+	filtering done in: 6.04089999999851s

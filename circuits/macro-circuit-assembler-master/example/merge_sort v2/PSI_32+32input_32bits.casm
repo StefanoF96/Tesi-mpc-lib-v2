@@ -1,0 +1,130 @@
+127 6943
+2 1216 1216
+1 2016
+2432 2432 [0:4863] ./sorter_32+32input_32bits_for_PSI.casm
+64 1 [2432:2495] 4864 ./32bit_equality.casm
+64 1 [2464:2527] 4865 ./32bit_equality.casm
+64 1 [2496:2559] 4866 ./32bit_equality.casm
+64 1 [2528:2591] 4867 ./32bit_equality.casm
+64 1 [2560:2623] 4868 ./32bit_equality.casm
+64 1 [2592:2655] 4869 ./32bit_equality.casm
+64 1 [2624:2687] 4870 ./32bit_equality.casm
+64 1 [2656:2719] 4871 ./32bit_equality.casm
+64 1 [2688:2751] 4872 ./32bit_equality.casm
+64 1 [2720:2783] 4873 ./32bit_equality.casm
+64 1 [2752:2815] 4874 ./32bit_equality.casm
+64 1 [2784:2847] 4875 ./32bit_equality.casm
+64 1 [2816:2879] 4876 ./32bit_equality.casm
+64 1 [2848:2911] 4877 ./32bit_equality.casm
+64 1 [2880:2943] 4878 ./32bit_equality.casm
+64 1 [2912:2975] 4879 ./32bit_equality.casm
+64 1 [2944:3007] 4880 ./32bit_equality.casm
+64 1 [2976:3039] 4881 ./32bit_equality.casm
+64 1 [3008:3071] 4882 ./32bit_equality.casm
+64 1 [3040:3103] 4883 ./32bit_equality.casm
+64 1 [3072:3135] 4884 ./32bit_equality.casm
+64 1 [3104:3167] 4885 ./32bit_equality.casm
+64 1 [3136:3199] 4886 ./32bit_equality.casm
+64 1 [3168:3231] 4887 ./32bit_equality.casm
+64 1 [3200:3263] 4888 ./32bit_equality.casm
+64 1 [3232:3295] 4889 ./32bit_equality.casm
+64 1 [3264:3327] 4890 ./32bit_equality.casm
+64 1 [3296:3359] 4891 ./32bit_equality.casm
+64 1 [3328:3391] 4892 ./32bit_equality.casm
+64 1 [3360:3423] 4893 ./32bit_equality.casm
+64 1 [3392:3455] 4894 ./32bit_equality.casm
+64 1 [3424:3487] 4895 ./32bit_equality.casm
+64 1 [3456:3519] 4896 ./32bit_equality.casm
+64 1 [3488:3551] 4897 ./32bit_equality.casm
+64 1 [3520:3583] 4898 ./32bit_equality.casm
+64 1 [3552:3615] 4899 ./32bit_equality.casm
+64 1 [3584:3647] 4900 ./32bit_equality.casm
+64 1 [3616:3679] 4901 ./32bit_equality.casm
+64 1 [3648:3711] 4902 ./32bit_equality.casm
+64 1 [3680:3743] 4903 ./32bit_equality.casm
+64 1 [3712:3775] 4904 ./32bit_equality.casm
+64 1 [3744:3807] 4905 ./32bit_equality.casm
+64 1 [3776:3839] 4906 ./32bit_equality.casm
+64 1 [3808:3871] 4907 ./32bit_equality.casm
+64 1 [3840:3903] 4908 ./32bit_equality.casm
+64 1 [3872:3935] 4909 ./32bit_equality.casm
+64 1 [3904:3967] 4910 ./32bit_equality.casm
+64 1 [3936:3999] 4911 ./32bit_equality.casm
+64 1 [3968:4031] 4912 ./32bit_equality.casm
+64 1 [4000:4063] 4913 ./32bit_equality.casm
+64 1 [4032:4095] 4914 ./32bit_equality.casm
+64 1 [4064:4127] 4915 ./32bit_equality.casm
+64 1 [4096:4159] 4916 ./32bit_equality.casm
+64 1 [4128:4191] 4917 ./32bit_equality.casm
+64 1 [4160:4223] 4918 ./32bit_equality.casm
+64 1 [4192:4255] 4919 ./32bit_equality.casm
+64 1 [4224:4287] 4920 ./32bit_equality.casm
+64 1 [4256:4319] 4921 ./32bit_equality.casm
+64 1 [4288:4351] 4922 ./32bit_equality.casm
+64 1 [4320:4383] 4923 ./32bit_equality.casm
+64 1 [4352:4415] 4924 ./32bit_equality.casm
+64 1 [4384:4447] 4925 ./32bit_equality.casm
+64 1 [4416:4479] 4926 ./32bit_equality.casm
+33 32 [2432:2463] 4864 [4927:4958] ./32bit_mult_1bit.txt
+33 32 [2464:2495] 4865 [4959:4990] ./32bit_mult_1bit.txt
+33 32 [2496:2527] 4866 [4991:5022] ./32bit_mult_1bit.txt
+33 32 [2528:2559] 4867 [5023:5054] ./32bit_mult_1bit.txt
+33 32 [2560:2591] 4868 [5055:5086] ./32bit_mult_1bit.txt
+33 32 [2592:2623] 4869 [5087:5118] ./32bit_mult_1bit.txt
+33 32 [2624:2655] 4870 [5119:5150] ./32bit_mult_1bit.txt
+33 32 [2656:2687] 4871 [5151:5182] ./32bit_mult_1bit.txt
+33 32 [2688:2719] 4872 [5183:5214] ./32bit_mult_1bit.txt
+33 32 [2720:2751] 4873 [5215:5246] ./32bit_mult_1bit.txt
+33 32 [2752:2783] 4874 [5247:5278] ./32bit_mult_1bit.txt
+33 32 [2784:2815] 4875 [5279:5310] ./32bit_mult_1bit.txt
+33 32 [2816:2847] 4876 [5311:5342] ./32bit_mult_1bit.txt
+33 32 [2848:2879] 4877 [5343:5374] ./32bit_mult_1bit.txt
+33 32 [2880:2911] 4878 [5375:5406] ./32bit_mult_1bit.txt
+33 32 [2912:2943] 4879 [5407:5438] ./32bit_mult_1bit.txt
+33 32 [2944:2975] 4880 [5439:5470] ./32bit_mult_1bit.txt
+33 32 [2976:3007] 4881 [5471:5502] ./32bit_mult_1bit.txt
+33 32 [3008:3039] 4882 [5503:5534] ./32bit_mult_1bit.txt
+33 32 [3040:3071] 4883 [5535:5566] ./32bit_mult_1bit.txt
+33 32 [3072:3103] 4884 [5567:5598] ./32bit_mult_1bit.txt
+33 32 [3104:3135] 4885 [5599:5630] ./32bit_mult_1bit.txt
+33 32 [3136:3167] 4886 [5631:5662] ./32bit_mult_1bit.txt
+33 32 [3168:3199] 4887 [5663:5694] ./32bit_mult_1bit.txt
+33 32 [3200:3231] 4888 [5695:5726] ./32bit_mult_1bit.txt
+33 32 [3232:3263] 4889 [5727:5758] ./32bit_mult_1bit.txt
+33 32 [3264:3295] 4890 [5759:5790] ./32bit_mult_1bit.txt
+33 32 [3296:3327] 4891 [5791:5822] ./32bit_mult_1bit.txt
+33 32 [3328:3359] 4892 [5823:5854] ./32bit_mult_1bit.txt
+33 32 [3360:3391] 4893 [5855:5886] ./32bit_mult_1bit.txt
+33 32 [3392:3423] 4894 [5887:5918] ./32bit_mult_1bit.txt
+33 32 [3424:3455] 4895 [5919:5950] ./32bit_mult_1bit.txt
+33 32 [3456:3487] 4896 [5951:5982] ./32bit_mult_1bit.txt
+33 32 [3488:3519] 4897 [5983:6014] ./32bit_mult_1bit.txt
+33 32 [3520:3551] 4898 [6015:6046] ./32bit_mult_1bit.txt
+33 32 [3552:3583] 4899 [6047:6078] ./32bit_mult_1bit.txt
+33 32 [3584:3615] 4900 [6079:6110] ./32bit_mult_1bit.txt
+33 32 [3616:3647] 4901 [6111:6142] ./32bit_mult_1bit.txt
+33 32 [3648:3679] 4902 [6143:6174] ./32bit_mult_1bit.txt
+33 32 [3680:3711] 4903 [6175:6206] ./32bit_mult_1bit.txt
+33 32 [3712:3743] 4904 [6207:6238] ./32bit_mult_1bit.txt
+33 32 [3744:3775] 4905 [6239:6270] ./32bit_mult_1bit.txt
+33 32 [3776:3807] 4906 [6271:6302] ./32bit_mult_1bit.txt
+33 32 [3808:3839] 4907 [6303:6334] ./32bit_mult_1bit.txt
+33 32 [3840:3871] 4908 [6335:6366] ./32bit_mult_1bit.txt
+33 32 [3872:3903] 4909 [6367:6398] ./32bit_mult_1bit.txt
+33 32 [3904:3935] 4910 [6399:6430] ./32bit_mult_1bit.txt
+33 32 [3936:3967] 4911 [6431:6462] ./32bit_mult_1bit.txt
+33 32 [3968:3999] 4912 [6463:6494] ./32bit_mult_1bit.txt
+33 32 [4000:4031] 4913 [6495:6526] ./32bit_mult_1bit.txt
+33 32 [4032:4063] 4914 [6527:6558] ./32bit_mult_1bit.txt
+33 32 [4064:4095] 4915 [6559:6590] ./32bit_mult_1bit.txt
+33 32 [4096:4127] 4916 [6591:6622] ./32bit_mult_1bit.txt
+33 32 [4128:4159] 4917 [6623:6654] ./32bit_mult_1bit.txt
+33 32 [4160:4191] 4918 [6655:6686] ./32bit_mult_1bit.txt
+33 32 [4192:4223] 4919 [6687:6718] ./32bit_mult_1bit.txt
+33 32 [4224:4255] 4920 [6719:6750] ./32bit_mult_1bit.txt
+33 32 [4256:4287] 4921 [6751:6782] ./32bit_mult_1bit.txt
+33 32 [4288:4319] 4922 [6783:6814] ./32bit_mult_1bit.txt
+33 32 [4320:4351] 4923 [6815:6846] ./32bit_mult_1bit.txt
+33 32 [4352:4383] 4924 [6847:6878] ./32bit_mult_1bit.txt
+33 32 [4384:4415] 4925 [6879:6910] ./32bit_mult_1bit.txt
+33 32 [4416:4447] 4926 [6911:6942] ./32bit_mult_1bit.txt

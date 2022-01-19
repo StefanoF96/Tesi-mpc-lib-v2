@@ -1,0 +1,6 @@
+3 1824
+1 608
+1 608
+304 304 [0:255] [512:559] [608:911] ./odd_evenMergeSort8val_32bit.casm
+304 304 [256:511] [560:607] [912:1215] ./odd_evenMergeSort8val_32bit.casm
+608 608 [608:863] [912:1167] [864:911] [1168:1823] ./odd_evenMerge16val_32bit.casm

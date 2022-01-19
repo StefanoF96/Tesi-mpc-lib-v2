@@ -1,0 +1,18 @@
+15 791
+2 140 140
+1 224
+280 280 [0:559] ./sorter_4+4input_32bits_for_PSI.casm
+64 1 [280:343] 560 ./32bit_equality.casm
+64 1 [312:375] 561 ./32bit_equality.casm
+64 1 [344:407] 562 ./32bit_equality.casm
+64 1 [376:439] 563 ./32bit_equality.casm
+64 1 [408:471] 564 ./32bit_equality.casm
+64 1 [440:503] 565 ./32bit_equality.casm
+64 1 [472:535] 566 ./32bit_equality.casm
+33 32 [280:311] 560 [567:598] ./32bit_mult_1bit.txt
+33 32 [312:343] 561 [599:630] ./32bit_mult_1bit.txt
+33 32 [344:375] 562 [631:662] ./32bit_mult_1bit.txt
+33 32 [376:407] 563 [663:694] ./32bit_mult_1bit.txt
+33 32 [408:439] 564 [695:726] ./32bit_mult_1bit.txt
+33 32 [440:471] 565 [727:758] ./32bit_mult_1bit.txt
+33 32 [472:503] 566 [759:790] ./32bit_mult_1bit.txt

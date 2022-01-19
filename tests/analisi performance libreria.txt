@@ -1,0 +1,10 @@
+JIFF(24 bit): equality test time ~ 0.3642s
+JIGG(32 bit): equality test time ~ 0.3086s
+
+JIFF(24 bit): sorting test time (1-1 vals) ~ 10.6123s
+JIFF(24 bit): sorting test time (2-2 vals) ~ 37.9306s
+JIFF(24 bit): sorting test time (4-4 vals) ~ 115.924s
+JIFF(24 bit): sorting test time (8-8 vals) ~ 336.3719s (240 comparazinoni)
+JIFF(24 bit): sorting test time (16-16 vals) ~ 979.6954s (672 comparazinoni)
+JIGG(32 bit): sorting test time (4-4 vals) ~ 4.4345s
+

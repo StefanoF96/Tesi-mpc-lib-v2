@@ -266,18 +266,29 @@
 		
 		
 		//jiff sorting
-		var jiff_sorting = function(inputs){
+		//if input len hidden, computation is more expensive
+		var jiff_sorting = function(inputs, len_hide = false){
 			
 			// final answer of this function here
 			var deferred = $.Deferred();
 			
 			//step 1: padding.  This step has the goal of hiding parties's input lengths
-			var shares = mpc.jiffClient.share(inputs.length);
-			var inputs_len_shr = shares[1];
-			for (i=2;i<=mpc.jiffClient.party_count;i++){
-				inputs_len_shr = inputs_len_shr.add(shares[i]);
+			var inputs_len = $.Deferred();
+			
+			if (len_hide){
+				var shares = mpc.jiffClient.share(inputs.length);
+				var inputs_len_shr = shares[1];
+				for (i=2;i<=mpc.jiffClient.party_count;i++){
+					inputs_len_shr = inputs_len_shr.add(shares[i]);
+				}
+				len = mpc.jiffClient.open(inputs_len_shr);
+				len.then(function(l){
+					inputs_len.resolve(l);
+				});
 			}
-			var inputs_len = mpc.jiffClient.open(inputs_len_shr);
+			else{
+				inputs_len.resolve(inputs.length);
+			}
 			
 			inputs_len.then(function(len){
 				var pad = new Array(len-inputs.length).fill(0);
@@ -285,7 +296,7 @@
 				my_inputs.push(...pad);
 				
 				//DEBUG
-				console.log("DEBUG: step 1 done");
+				//console.log("DEBUG: step 1 done");
 				//step 2: compute sorting
 				var arr_shares = mpc.jiffClient.share_array(my_inputs);
 				var arrays_cocat;
@@ -317,10 +328,18 @@
 					//DEBUG
 					console.log("DEBUG: sorting done, opening results..");
 					
-					var result = mpc.jiffClient.open_array(mpc.sort_arr_conc_key.slice(mpc.sort_arr_conc_key.length-len, mpc.sort_arr_conc_key.length));
-					result.then(function(res){
-						deferred.resolve(len,res,mpc.sort_arr_conc.slice(mpc.sort_arr_conc.length-len, mpc.sort_arr_conc.length));
-					});			
+					if (len_hide){
+						var result = mpc.jiffClient.open_array(mpc.sort_arr_conc_key.slice(mpc.sort_arr_conc_key.length-len, mpc.sort_arr_conc_key.length));
+						result.then(function(res){
+							deferred.resolve(len,res,mpc.sort_arr_conc.slice(mpc.sort_arr_conc.length-len, mpc.sort_arr_conc.length));
+						});
+					}
+					else{
+						var result = mpc.jiffClient.open_array(mpc.sort_arr_conc_key);
+						result.then(function(res){
+							deferred.resolve(len,res,mpc.sort_arr_conc);
+						});
+					}
 				});
 			});
 			
@@ -346,7 +365,7 @@
 		 ?
 		 *					 
      */ 
-		mpc.compute_sorting = function(value){
+		mpc.compute_sorting = function(value, hide_input_len = false){
 			if(value.some(isNaN))
 				throw new Error('compute_sorting accepts an array of only positive integer values');
 			
@@ -356,7 +375,7 @@
 					try{
 						//what to do after connection (i.e implementation of comparison operation)
 						mpc.options.onConnect = function () {
-							jiff_sorting(value).then(function(len,res){
+							jiff_sorting(value, hide_input_len).then(function(len,res){
 								mpc.result = res;
 								resolve(mpc.result);
 							});
@@ -367,7 +386,7 @@
 						else //else trigger directly the function to compute
 						{
 							
-							jiff_sorting(value).then(function(len,res){
+							jiff_sorting(value, hide_input_len).then(function(len,res){
 								mpc.result = res;
 								resolve(mpc.result);
 							});
@@ -556,20 +575,59 @@
 			return share1.mult(matching);
 		}
 		
+		var selectNvalues = function(shares_array){
+			var matching = 1;
+			first_share = shares_array[0];
+			//remove first element to skip a usless comparison below
+			shares_array = shares_array.slice(1,shares_array.length);
+			
+			shares_array.forEach(function(shr){
+				matching = (first_share.eq(shr)).mult(matching);
+			});
+
+			return first_share.mult(matching);
+		}
+		
 		//PSI using  Sort-Compare-Shuffle Algorithm
 		var jiff_intersection_2 = function(inputs){
 			var deferred = $.Deferred();
 			mpc.intersection_res = [];
+			
+			//DBG timing
+			start_time = performance.now();
+			
 			//this algorithm needs to sort first.
 			jiff_sorting(inputs).then(function(len,positions,val_shares){
 				console.log("DEBUG: sorting done!");
-				for(i=0; i<len-1; i++){
-					mpc.intersection_res.push(DupSelect_2(val_shares[i],val_shares[i+1]));
+				//DBG timing
+				end_time = performance.now()
+				tot_comp_time = (end_time-start_time)/1000;
+				console.log("sorting done in: " + tot_comp_time + "s");
+				start_time_2 = performance.now();
+				
+				//DBG
+				//console.log(len);
+				//console.log(positions);
+				//console.log(val_shares);
+				//DBG
+				
+				n_party = mpc.jiffClient.party_count;
+				for(i=0; i<=len-n_party; i++){
+					//mpc.intersection_res.push(DupSelect_2(val_shares[i],val_shares[i+1]));
+					shares = [];
+					for(j=0;j<n_party; j++)
+						shares.push(val_shares[i+j]);
+					mpc.intersection_res.push(selectNvalues(shares));
 				}
 				//open result
 				var result = mpc.jiffClient.open_array(mpc.intersection_res);
 				result.then(function(res){
 					console.log("DEBUG: filtering done!");
+					//DBG timing
+					end_time_2 = performance.now()
+					tot_comp_time = (end_time_2-start_time_2)/1000;
+					console.log("filtering done in: " + tot_comp_time + "s");
+
 					res = res.filter(function(a){return a !== 0}); //remove zero values
 					var unique_res = [];
 					//remove dupplicates in result

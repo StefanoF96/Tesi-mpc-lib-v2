@@ -1,0 +1,6 @@
+3 1728
+2 288 288
+1 64
+288 288 [0:287] [576:863] ./odd_evenMergeSort8val_32bit.casm
+288 288 [288:575] [864:1151] ./odd_evenMergeSort8val_32bit.casm
+576 576 [576:831] [864:1119] [832:863] [1120:1151] [1152:1727] ./odd_evenMerge16val_32bit.casm

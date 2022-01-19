@@ -1,0 +1,8 @@
+5 25
+2 8 8
+1 1
+2 1 0 0 16 ./costant0.txt
+1 1 16 17 INV
+2 1 0 0 18 ./costant0.txt
+11 3 [0:3] [8:11] [16:18] [19:21] ./4bit_comparator(cascade).txt
+11 3 [4:7] [12:15] [19:21] 24 22 23 ./4bit_comparator(cascade).txt

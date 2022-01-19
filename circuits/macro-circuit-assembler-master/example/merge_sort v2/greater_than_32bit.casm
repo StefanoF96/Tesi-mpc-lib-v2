@@ -1,0 +1,14 @@
+11 91
+2 32 32
+1 1
+2 1 0 0 64 ./costant0.txt
+1 1 64 65 INV
+2 1 0 0 66 ./costant0.txt
+11 3 [0:3] [32:35] [64:66] [67:69] ./4bit_comparator(cascade).txt
+11 3 [4:7] [36:39] [67:69] [70:72] ./4bit_comparator(cascade).txt
+11 3 [8:11] [40:43] [70:72] [73:75] ./4bit_comparator(cascade).txt
+11 3 [12:15] [44:47] [73:75] [76:78] ./4bit_comparator(cascade).txt
+11 3 [16:19] [48:51] [76:78] [79:81] ./4bit_comparator(cascade).txt
+11 3 [20:23] [52:55] [79:81] [82:84] ./4bit_comparator(cascade).txt
+11 3 [24:27] [56:59] [82:84] [85:87] ./4bit_comparator(cascade).txt
+11 3 [28:31] [60:63] [85:87] 90 88 89 ./4bit_comparator(cascade).txt
