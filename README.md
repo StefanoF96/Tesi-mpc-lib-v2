@@ -14,5 +14,5 @@ Install
      ```
   - init library 
     ```javascript
-    var isimple_mpc.init_simple_mpc('localhost',$('#num_parties').val(), $('#comp_id').val(), $('#implem_type').val());
+    var instance = isimple_mpc.init_simple_mpc('localhost',$('#num_parties').val(), $('#comp_id').val(), $('#implem_type').val());
     ```
